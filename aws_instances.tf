@@ -69,12 +69,13 @@ resource "aws_security_group" "allow_ssh" {
   #   cidr_blocks = ["20.211.107.191/32"] # Update with the specific IP address for your VM
   # }
 
-  # ingress {
-  #   from_port   = 22
-  #   to_port     = 22
-  #   protocol    = "tcp"
-  #   cidr_blocks = ["13.239.158.0/29"] # Update with the specific IP address for your VM
-  # }
+  # EC2 Instance Connect - ap-southeast-2 IP Range
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["13.239.158.0/29"]
+  }
 
 
   # Cloudflare IPs - https://www.cloudflare.com/ips-v4/

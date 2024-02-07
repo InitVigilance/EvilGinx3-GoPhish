@@ -78,7 +78,11 @@ key is in statefile not that effective
 - Install AWS CLI and login
 
 - Install terraform
+
   - add/modify the terraform template for your own personal SSH key
   - ssh-keygen -m PEM -f `file-name`
   - add the pub key to terraform template
   - `terraform validate` -> `terraform apply`
+
+- remember to add resolv.conf file edit for port 53
+- dont add bots on cloudflare till after initialisation
