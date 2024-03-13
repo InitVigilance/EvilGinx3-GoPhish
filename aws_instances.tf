@@ -13,28 +13,6 @@ provider "aws" {
   region = "ap-southeast-2"
 }
 
-# resource "aws_instance" "GoPhish_Instance" {
-#   ami                    = "ami-04f5097681773b989"
-#   instance_type          = "t2.micro"
-#   subnet_id              = aws_default_subnet.default_az1.id
-#   vpc_security_group_ids = [aws_security_group.allow_ssh.id]
-#   key_name               = aws_key_pair.access_key.key_name
-#   tags = {
-#     Name = "GoPhish-Phishing"
-#   }
-# }
-
-# resource "aws_instance" "EvilGinx_Instance" {
-#   ami                    = "ami-04f5097681773b989"
-#   instance_type          = "t2.micro"
-#   subnet_id              = aws_default_subnet.default_az1.id
-#   vpc_security_group_ids = [aws_security_group.allow_ssh.id]
-#   key_name               = aws_key_pair.access_key.key_name
-#   tags = {
-#     Name = "EvilGinx-Phishing"
-#   }
-# }
-
 resource "aws_instance" "EvilGinx_GoPhish_Instance" {
   ami                    = "ami-04f5097681773b989"
   instance_type          = "t2.micro"
@@ -66,7 +44,7 @@ resource "aws_security_group" "allow_ssh" {
   #   from_port   = 22
   #   to_port     = 22
   #   protocol    = "tcp"
-  #   cidr_blocks = ["20.211.107.191/32"] # Update with the specific IP address for your VM
+  #   cidr_blocks = ["20.211.107.191/32"] # Update with the specific IP address for your VM - If required
   # }
 
   # EC2 Instance Connect - ap-southeast-2 IP Range

@@ -1,88 +1,71 @@
-# Phishing2024
+# Evilginx3 + GoPhish
+Modified repository of https://github.com/fin3ss3g0d/evilgophish focused on AWS Infrastructure with Cloudflare as a proxy.
 
-## Table of contents
+## Setup Files
 
-1. [Deploy AWS Instances](#deploy-aws-instances)
+### aws_instances.tf - Terraform
+`aws_instances.tf` is a Terraform template that creates an EC2 instance. Default values include:
+- Region for `ap-southeast-2`.
+- Free Ubuntu AMI named `EvilGinx3-GoPhish-Phishing`.
+- Default subnet and vpc for `ap-southeast-2`.
+- Security group `allow_ssh` which allows connections from:
+  - EC2 Instance Connect - `ap-southeast-2` IP Range.
+  - Cloudflare IPs.
+- AWS Key Pair Generation which requires a public key to be inserted during initialisation.
 
-## Infrastructure Setup
+### setup.sh
+Provides setup and installation for Evilginx3, Apache, and GoPhish. To run this script, your domain and DNS hosting must be operational.
 
-### Establish Email
+## Domain Setup
+### Deploy AWS Instances
 
-- Use an email provider of your choice for the creation of this infrastructure.
+To deploy the terraform template it requires:
 
-### Establish Domain
+- Terraform CLI (1.2.0+)
+- AWS CLI 
 
-Establish a Domain used for the engagement. The following links can assist in identifying potential domains.
+See here for all details/video instructions to deploy `aws_instances.tf` - https://developer.hashicorp.com/terraform/tutorials/aws-get-started/aws-build
 
-**DNS Finder Tools**
+The template requires that you create an `SSH` key locally and insert the generated public key + key_name into the template. This key will be used for SSH connections to this instance.
 
-- https://github.com/urbanadventurer/urlcrazy
-- https://github.com/elceef/dnstwist
+```Ensure that your IP is permitted to access the EC2 Instance in the newly created security group in AWS.```
 
-**DNS Finder Websites**
+[Amazon Documentation - Import public key](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html#how-to-generate-your-own-key-and-import-it-to-aws_) - ``` ssh-keygen -m PEM -f `file-name` ```
 
-- https://dnstwist.it/
-- https://www.expireddomains.net/
+After creating your Key-Pair and modifying the terraform file run `terraform validate` to validate the modified file and `terraform apply` to apply changes. After deployment newly created instances can be found in AWS.
 
-**DNS Reputation Websites**
+To destroy your infrastructure run `terraform destroy`.
 
-- https://urlfiltering.paloaltonetworks.com/query/
-- https://talosintelligence.com/reputation_center/
+## Instance Setup
 
-### Domain Setup
+### Network Manager
+- Modify Network Manager as by default it uses a proxy for DNS.
+  - Can identify this with netstat -nltp | grep 53.
+  - We need EvilGinx to listen on port 53.
+  - `sudo systemctl stop systemd-resolved.service` will fix this.
+- To fix DNS resolution
+  - `nano resolv.conf`
+  - Add Cloudflar DNS Resolvers - https://developers.cloudflare.com/1.1.1.1/ip-addresses/
+    - `nameserver 1.1.1.1`
+    - `nameserver 1.0.0.1`
+- To fix it permanently <TO CHECK>
+    - `nano /etc/NetworkManager/NetworkManager.conf`
+    - add `dns=default` under `[main]` 
 
-## Deploy AWS Instances
 
-To deploy AWS instances you can use the terraform template provided in [`aws_instances.tf`](/aws_instances.tf). This template creates one AWS EC2 instance with the following details:
+### Setup
 
-- `ap-southeast-2`
-- Ubuntu Server 22.04 - `ami-04f5097681773b989`
-  - `t2.micro` Instance type
+Before setup ensure:
+- You have an email and domain established.
+- The domain is setup in Cloudflare.
+- You know the phishlet you're running and subdomains are setup correctly in Cloudflare.
 
-To deploy the terraform template you require:
+Download the Infrastructure folder onto your Instance and run `setup.sh` with elevated permissions. This script will:
+  - Use letsencrypt for  certificate generation for apache
+  - Install all dependecies with apt
+  - Setup EvilGinx3
+  - Setup GoPhish
 
-- Terraform CLI (1.2.0+) installed
-- The AWS CLI installed
 
-See here for all details/video instructions - https://developer.hashicorp.com/terraform/tutorials/aws-get-started/aws-build
-
-The template requires that you create an `SSH` key locally and insert the generated public key + key_name into the template. This key will be used for SSH connections to the instance.
-
-After deploying, the instance should be available in AWS.
-
-#### Ensure that your IP is permitted to access the EC2 Instance in the newly created security group if you did not insert your IP in the Terraform template.
-
-#### Create a Key-Pair for the EC2 Instance
-
--- Below is inaccurate --
-
-After logging in - Either through `SSH` or `EC2 Instance Connect` you can initialise the virtual machine using the script ``
-
-run script
-
-- do `go build`
-
-if there are sudo issues - https://askubuntu.com/questions/59458/error-message-sudo-unable-to-resolve-host-none
-
-https://help.evilginx.com/docs/getting-started/building - EvilGinx setup
-
-SSH Tunneling
-ssh -L 8080:localhost:3333 ubuntu@pub001.host
-
-key is in statefile not that effective
-
----
-
-# 1/02
-
-- Install AWS CLI and login
-
-- Install terraform
-
-  - add/modify the terraform template for your own personal SSH key
-  - ssh-keygen -m PEM -f `file-name`
-  - add the pub key to terraform template
-  - `terraform validate` -> `terraform apply`
-
-- remember to add resolv.conf file edit for port 53
-- dont add bots on cloudflare till after initialisation
+## To add during E2E testing
+- Confirm DNS Resolution

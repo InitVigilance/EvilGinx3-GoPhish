@@ -137,7 +137,7 @@ function setup_evilginx3 () {
     systemctl stop systemd-resolved
     
     # Build evilginx3
-    cd evilginx2 || exit 1
+    cd evilginx3 || exit 1
     go build -o evilginx3
     cd ..
     print_good "Configured evilginx3!"
